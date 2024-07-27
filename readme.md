@@ -19,3 +19,11 @@ git checkout -b personal -t myfork/personal
 ```
 
 Use the `personal` branch for all changes. 
+
+## Changing keymap
+
+- use [QMK Configurator](https://config.qmk.fm/#/boardsource/unicorne/LAYOUT_split_3x6_3) load & save keymap 
+  - https://raw.githubusercontent.com/mattngu01/qmk_firmware/personal/keyboards/boardsource/unicorne/keymaps/mattngu01/keymap.json for import from link
+- download & copy paste keymap
+- compile (`qmk compile -kb boardsource/unicorne -km mattngu01`)
+- `cp boardsource_unicorne_mattngu01.uf2 /mnt/c/Users/Akihiro/Downloads/`
