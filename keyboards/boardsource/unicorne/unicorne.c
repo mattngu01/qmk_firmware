@@ -10,10 +10,49 @@ oled_rotation_t oled_init_kb(oled_rotation_t rotation) {
     return rotation;
 }
 
+uint16_t anim_timer = 0;
+uint16_t anim_sleep = 0;
+uint8_t current_idle_frame = 0;
+uint8_t current_tap_frame = 0;
+
+static void render_anim(void) {
+    void animation_phase(void) {
+        if (get_current_wpm() <= IDLE_SPEED) {
+            current_idle_frame = (current_idle_frame + 1 > IDLE_FRAMES - 1) ? 0 : current_idle_frame + 1;
+
+            oled_write_raw_P(idle[abs((IDLE_FRAMES - 1) - current_idle_frame)], ANIM_SIZE);
+        }
+
+        else if (get_current_wpm() > IDLE_SPEED && get_current_wpm() < TAP_SPEED) {
+            oled_write_raw_P(prep[0], ANIM_SIZE);
+        }
+
+        else if (get_current_wpm() >= TAP_SPEED) {
+            current_tap_frame = (current_tap_frame + 1) & 1;
+
+            oled_write_raw_P(tap[abs((TAP_FRAMES - 1) - current_tap_frame)], ANIM_SIZE);
+        }
+    }
+
+    if (get_current_wpm() != 000) {
+        anim_sleep = timer_read();
+    }
+
+    if (timer_elapsed(anim_timer) > ANIM_FRAME_DURATION) {
+        anim_timer = timer_read();
+
+        animation_phase();
+    }
+}
+
+char wpm_str[6];
+
 bool oled_task_kb(void) {
     if (!oled_task_user()) {
         return false;
     }
+
+    #ifdef WPM_ENABLE
     if (is_keyboard_master()) {
         switch (get_highest_layer(layer_state)) {
             case 0:
@@ -30,8 +69,9 @@ bool oled_task_kb(void) {
                 break;
         }
     } else {
-        oled_write_raw(logo, sizeof(logo));
+        render_anim();
     }
     return false;
+    #endif //WPM_ENABLE
 }
-#endif
+#endif //oled driver enable
