@@ -1,0 +1,2 @@
+compile:
+	qmk compile -kb boardsource/unicorne -km mattngu01 &&  cp ~/qmk_firmware/boardsource_unicorne_mattngu01.uf2 /mnt/c/Users/Akihiro/Downloads/
