@@ -10,10 +10,13 @@ oled_rotation_t oled_init_kb(oled_rotation_t rotation) {
     return rotation;
 }
 
-uint16_t anim_timer = 0;
-uint16_t anim_sleep = 0;
+uint32_t anim_timer = 0;
+uint32_t anim_sleep = 0;
 uint8_t current_idle_frame = 0;
 uint8_t current_tap_frame = 0;
+// want shorter timeout than OLED_TIMEOUT
+uint32_t BONGO_TIMEOUT_MS = 10000; 
+bool bongo_awake = true;
 
 static void render_anim(void) {
     void animation_phase(void) {
@@ -36,13 +39,26 @@ static void render_anim(void) {
 
     if (get_current_wpm() != 000) {
         anim_sleep = timer_read();
+        if (timer_elapsed(anim_timer) > ANIM_FRAME_DURATION) {
+            anim_timer = timer_read();
+
+            animation_phase();
+        }
+        bongo_awake = true;
+    } else {
+        if (timer_elapsed(anim_sleep) > BONGO_TIMEOUT_MS) {
+            oled_off();
+            // need bool to keep track, anim timer will keep going after sleeping & trigger idle animation
+            bongo_awake = false;
+        } else {
+            if (bongo_awake == true && timer_elapsed(anim_timer) > ANIM_FRAME_DURATION) {
+                anim_timer = timer_read();
+
+                animation_phase();
+            }
+        }
     }
 
-    if (timer_elapsed(anim_timer) > ANIM_FRAME_DURATION) {
-        anim_timer = timer_read();
-
-        animation_phase();
-    }
 }
 
 char wpm_str[6];
