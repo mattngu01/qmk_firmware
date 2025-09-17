@@ -17,8 +17,6 @@ git checkout -b personal -t myfork/personal
 ```
 
 Use the `personal` branch for all changes. 
-<<<<<<< HEAD
-=======
 
 ## Changing keymap
 
@@ -27,4 +25,3 @@ Use the `personal` branch for all changes.
 - download & copy paste keymap
 - compile (`qmk compile -kb boardsource/unicorne -km mattngu01`)
 - `cp boardsource_unicorne_mattngu01.uf2 /mnt/c/Users/Akihiro/Downloads/`
->>>>>>> Update readme & add arrow keys to layer 2
